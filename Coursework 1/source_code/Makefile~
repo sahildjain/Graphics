@@ -17,4 +17,3 @@ cgRender.o: $(INCS) cgRender.cpp
 
 cgRender: $(OBJS)
 	$(LD) $(OBJS) -o cgRender $(LDFLAGS)
-
