@@ -5,12 +5,42 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cstring>
+#include <sstream>
 using namespace std;
 
-typedef struct {
+class Vertex {
   float x;
   float y;
   float z;
-} vertex;
+
+  public: 
+
+  int getX() {
+    return x;
+  }
+
+  int getY() {
+    return y;
+  }
+
+  int getZ() {
+    return z;
+  }
+
+  void setX(int newX) {
+      x = newX;
+  }
+
+  void setY(int newY) {
+      y = newY;
+  }
+
+  void setZ(int newZ) {
+      z = newZ;
+  }
+};
+
+int stringToFloat(string s);
 
 #endif
