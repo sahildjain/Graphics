@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <sstream>
 using namespace std;
 
 class Vertex {
@@ -40,10 +41,6 @@ class Vertex {
   }
 };
 
-/*typedef struct {
-  float x;
-  float y;
-  float z;
-} Vertex;*/
+int stringToFloat(string s);
 
 #endif
