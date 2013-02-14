@@ -4,6 +4,7 @@ using namespace std;
 
 typedef vector<string> VECSTRING;
 typedef vector<Vertex> VECVERTEX;
+typedef vector<Polygon> VECPOLYGON;
 
 // returns a vector of the lines in the vtk file
 VECSTRING getLines(const char * filename) {
@@ -43,7 +44,6 @@ VECVERTEX addVertices(VECVERTEX vertices, string line, int index) {
   char * token = strtok(l, " ");
   float x, y, z;
   while(counter < 3) {
-    //cout << index << endl;
     Vertex vertex;
     vertex.index = index;
     x = (float) atof(token);
@@ -75,6 +75,32 @@ VECVERTEX getVertices(VECSTRING lines) {
   return vertices;
 }
 
+VECPOLYGON addPolygon(VECPOLYGON polygons, string line) {
+  Polygon polygon;
+  char * l = &line[0];
+  char * token = strtok(l, " ");  
+  token = strtok(NULL, " ");
+  polygon.first = atoi(token);
+  token = strtok(NULL, " ");
+  polygon.second = atoi(token);
+  token = strtok(NULL, " ");
+  polygon.third = atoi(token);
+  polygons.push_back(polygon);
+  return polygons;
+}
+
+VECPOLYGON getPolygons(VECSTRING lines) {
+  string line;
+  VECPOLYGON polygons;
+  int start = getLineNum(lines, "POLYGONS") + 1;
+  int end = getLineNum(lines, "POINT_DATA");
+  for(int i = start; i < end; i++) {
+    line = lines[i];
+    polygons = addPolygon(polygons, line);
+  }
+  return polygons;
+}
+
 // prints out each line in the input vector
 void printLines(VECSTRING lines) {
   for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
@@ -90,8 +116,18 @@ void printVertices(VECVERTEX vertices) {
   }
 }
 
+// prints out each polygon in the input vector
+void printPolygons(VECPOLYGON polygons) {
+  for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
+    Polygon polygon = *it;
+    cout << polygon.first << " " << polygon.second << " " << polygon.third << endl;
+  }
+}
+
 int main(void) {
   char * filename = "../data/face.vtk";
   VECSTRING lines = getLines(filename);
   VECVERTEX vertices = getVertices(lines);
+  VECPOLYGON polygons = getPolygons(lines);
+  printPolygons(polygons);
 }

@@ -17,4 +17,10 @@ struct Vertex {
   int index;
 };
 
+struct Polygon {
+  int first;
+  int second;
+  int third;
+};
+
 #endif
