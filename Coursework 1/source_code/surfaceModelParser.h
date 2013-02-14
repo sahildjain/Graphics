@@ -14,9 +14,7 @@ struct Vertex {
   float x;
   float y;
   float z;
+  int index;
 };
-
-//vector<string> getLines(string filename);
-//void printLines(vector<string> lines) 
 
 #endif
