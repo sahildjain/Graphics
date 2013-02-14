@@ -68,8 +68,10 @@ VECVERTEX addVertices(VECVERTEX vertices, string line) {
 VECVERTEX getVertices(VECSTRING lines) {
   string line;
   VECVERTEX vertices;
-  for(int start = getLineNum(lines, "POINTS") + 1; start < getLineNum(lines, "POLYGONS"); start++) {
-    line = lines.at(start);
+  int start = getLineNum(lines, "POINTS") + 1;
+  int end = getLineNum(lines, "POLYGONS");
+  for(int i = start; i < end; i++) {
+    line = lines[i];
     vertices = addVertices(vertices, line);
   }
   return vertices;
