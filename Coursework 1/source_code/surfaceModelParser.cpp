@@ -1,11 +1,14 @@
 #include "surfaceModelParser.h"
-#include <vector>
 
 using namespace std;
 
-vector<string> getLines(string filename) {
-  vector<string> lines;
-  char * line;
+typedef vector<string> VECSTRING;
+typedef vector<Vertex> VECVERTEX;
+
+// returns a vector of the lines in the vtk file
+VECSTRING getLines(const char * filename) {
+  VECSTRING lines;
+  string line;
   ifstream file (filename);
   if(file.is_open()) {
     while(file.good()) {
@@ -17,14 +20,62 @@ vector<string> getLines(string filename) {
   return lines;
 }
 
-void printLines(vector<string> lines) {
+// prints out each entry in the input vector
+void printLines(VECSTRING lines) {
+  for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
+    cout << *it << endl;
+  }
+}
 
+int getFirstVertexLineNum(VECSTRING lines) {
+  int i = 0;
+  VECSTRING::iterator it = lines.begin();
+  string line = *it;
+  char * l = &line[0];
+  char * firstToken = strtok(l, " ");
+  while(strcmp(firstToken, "POINTS")) {
+    it++;
+    i++;
+    line = *it;
+    l = &line[0];
+    firstToken = strtok(l, " ");
+  }
+  return i;
+}
+
+int getLastVertexLineNum(VECSTRING lines) {
+  int i = -1;
+  VECSTRING::iterator it = lines.begin();
+  string line = *it;
+  char * l = &line[0];
+  char * firstToken = strtok(l, " ");
+  while(strcmp(firstToken, "POLYGONS")) {
+    it++;
+    i++;
+    line = *it;
+    l = &line[0];
+    firstToken = strtok(l, " ");
+  }
+  return i;
+}
+
+VECVERTEX getVertices(VECSTRING lines) {
+  int start = getFirstVertexLineNum(lines);
+  int end = getLastVertexLineNum(lines);
+  for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
+    
+  }
 }
 
 int main(void) {
-  string filename = "../data/face.vtk";
-  vector<string> lines = getLines(filename);
-  printLines(lines);
+  char * filename = "../data/face.vtk";
+  VECSTRING lines = getLines(filename);
+  int start = getFirstVertexLineNum(lines);
+  cout << start << endl;
+  int end = getLastVertexLineNum(lines);
+  cout << end << endl;
+  //printLines(lines);
+  //VECVERTEX vertices = getVertices(lines);
 }
 
 
