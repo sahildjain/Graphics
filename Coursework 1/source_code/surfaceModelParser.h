@@ -7,41 +7,14 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-using namespace std;
 
-class Vertex {
-  private:
-    float x;
-    float y;
-    float z;
+struct Vertex {
+  float x;
+  float y;
+  float z;
+}
 
-  public: 
-
-  int getX() {
-    return x;
-  }
-
-  int getY() {
-    return y;
-  }
-
-  int getZ() {
-    return z;
-  }
-
-  void setX(int newX) {
-      x = newX;
-  }
-
-  void setY(int newY) {
-      y = newY;
-  }
-
-  void setZ(int newZ) {
-      z = newZ;
-  }
-};
-
-int stringToFloat(string s);
+vector<string> getLines(string filename);
+void printLines(vector<string> lines) 
 
 #endif

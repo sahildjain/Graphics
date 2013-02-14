@@ -1,12 +1,40 @@
 #include "surfaceModelParser.h"
+#include <vector>
 
-vector<Vertex> getVertices(void) {
-  std::vector<Vertex> vertices;
-  char * line, floats;
+using namespace std;
+
+vector<string> getLines(string filename) {
+  vector<string> lines;
+  char * line;
+  ifstream file (filename);
+  if(file.is_open()) {
+    while(file.good()) {
+      getline(file, line);
+      lines.push_back(line);
+    }
+    file.close();
+  }
+  return lines;
+}
+
+void printLines(vector<string> lines) {
+
+}
+
+int main(void) {
+  string filename = "../data/face.vtk";
+  vector<string> lines = getLines(filename);
+  printLines(lines);
+}
+
+
+/*vector<Vertex> getVertices(string filename) {
+  vector<Vertex> vertices;
+  char * line, floats = "";
   int numVertex = 0, counter;
   double f;
   Vertex vertex;
-  ifstream file ("../data/face.vtk");
+  ifstream file (filename);
   if(file.is_open()) {
     while(file.good() || floats != "POLYGON") {
       getline(file, line);
@@ -47,7 +75,7 @@ int stringToFloat(string s) {
 }
 
 int main(void) {
-  /*string line;
+  string line;
   ifstream file ("../data/face.vtk");
   if(file.is_open()) {
     while(file.good()) {
@@ -59,5 +87,5 @@ int main(void) {
   else {
     cout << "Cannot open surface model file.";
   }
-  return 0;*/
-}
+  return 0;
+}*/
