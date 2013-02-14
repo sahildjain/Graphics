@@ -27,116 +27,68 @@ void printLines(VECSTRING lines) {
   }
 }
 
-int getFirstVertexLineNum(VECSTRING lines) {
+int getLineNum(VECSTRING lines, string str) {
   int i = 0;
   VECSTRING::iterator it = lines.begin();
   string line = *it;
   char * l = &line[0];
-  char * firstToken = strtok(l, " ");
-  while(strcmp(firstToken, "POINTS")) {
+  char * strcopy = &str[0];
+  char * token = strtok(l, " ");
+  while(strcmp(token, strcopy)) {
     it++;
     i++;
     line = *it;
     l = &line[0];
-    firstToken = strtok(l, " ");
+    token = strtok(l, " ");
   }
   return i;
 }
 
-int getLastVertexLineNum(VECSTRING lines) {
-  int i = -1;
-  VECSTRING::iterator it = lines.begin();
-  string line = *it;
+VECVERTEX addVertices(VECVERTEX vertices, string line) {
+  int counter = 0;
   char * l = &line[0];
-  char * firstToken = strtok(l, " ");
-  while(strcmp(firstToken, "POLYGONS")) {
-    it++;
-    i++;
-    line = *it;
-    l = &line[0];
-    firstToken = strtok(l, " ");
+  char * token = strtok(l, " ");
+  while(counter < 3) {
+    Vertex vertex;
+    float x = (float) atof(token);
+    vertex.x = x;
+    token = strtok(NULL, " ");
+    float y = (float) atof(token);
+    vertex.y = y;
+    token = strtok(NULL, " ");
+    float z = (float) atof(token);
+    vertex.z = z;
+    vertices.push_back(vertex);
+    token = strtok(NULL, " ");
+    counter++;
   }
-  return i;
+  return vertices;
 }
 
 VECVERTEX getVertices(VECSTRING lines) {
-  int start = getFirstVertexLineNum(lines);
-  int end = getLastVertexLineNum(lines);
-  for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
-    
+  string line;
+  VECVERTEX vertices;
+  for(int start = getLineNum(lines, "POINTS") + 1; start < getLineNum(lines, "POLYGONS"); start++) {
+    line = lines.at(start);
+    vertices = addVertices(vertices, line);
+  }
+  return vertices;
+}
+
+void printVertices(VECVERTEX vertices) {
+  for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    Vertex vertex = *it;
+    cout << vertex.x << " " << vertex.y << " " << vertex.z << endl;
   }
 }
 
 int main(void) {
   char * filename = "../data/face.vtk";
   VECSTRING lines = getLines(filename);
-  int start = getFirstVertexLineNum(lines);
+  int start = getLineNum(lines, "POINTS");
   cout << start << endl;
-  int end = getLastVertexLineNum(lines);
+  int end = getLineNum(lines, "POLYGONS");
   cout << end << endl;
-  //printLines(lines);
-  //VECVERTEX vertices = getVertices(lines);
+  VECVERTEX vertices = getVertices(lines);
+  printVertices(vertices);
 }
-
-
-/*vector<Vertex> getVertices(string filename) {
-  vector<Vertex> vertices;
-  char * line, floats = "";
-  int numVertex = 0, counter;
-  double f;
-  Vertex vertex;
-  ifstream file (filename);
-  if(file.is_open()) {
-    while(file.good() || floats != "POLYGON") {
-      getline(file, line);
-      int counter = 0; 
-      while(counter < 3) {
-        int count = 0;
-        floats = strtok(line, " ");    
-        while(count < 3) {
-          vertex = Vertex();             
-          f = stringToFloat(floats);
-          vertex.setX(f);
-          floats = strtok(NULL, " ");
-          f = stringToFloat(floats);
-          vertex.setY(f);
-          floats = strtok(NULL, " ");
-          f = stringToFloat(floats);
-          vertex.setZ(f);
-          floats = strtok(NULL, " ");
-          count++;
-        }
-        vertices.push_back(vertex);
-        counter++;
-      }
-    }
-    file.close();
-  }
-  else {
-    cout << "Cannot open surface model file.";
-  }
-  return vertices;
-}
-
-int stringToFloat(string s) {
-  stringstream stream(s);
-  float f;
-  stream >> f;
-  return f;
-}
-
-int main(void) {
-  string line;
-  ifstream file ("../data/face.vtk");
-  if(file.is_open()) {
-    while(file.good()) {
-      getline(file, line);
-      cout << line << endl;
-    }
-    file.close();
-  }
-  else {
-    cout << "Cannot open surface model file.";
-  }
-  return 0;
-}*/
