@@ -23,4 +23,10 @@ struct Polygon {
   int third;
 };
 
+struct TextureMapping {
+  int index;
+  float x;
+  float y;
+};
+
 #endif
