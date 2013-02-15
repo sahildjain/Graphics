@@ -174,6 +174,7 @@ void printTextureMappings(VECTEXTURE textures) {
   }
 }
 
+/*
 int main(void) {
   char * filename = "../data/face.vtk";
   VECSTRING lines = getLines(filename);
@@ -182,3 +183,4 @@ int main(void) {
   VECTEXTURE textures = getTextureMappings(lines);
   printTextureMappings(textures);
 }
+*/

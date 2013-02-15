@@ -1,4 +1,5 @@
 #include <cgRender.h>
+#include "surfaceModelParser.cpp"
 
 void init() 
 {
@@ -29,6 +30,16 @@ void display(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   cout << "display" << endl;
+  char * filename = "../data/face.vtk";
+  VECSTRING lines = getLines(filename);
+  VECVERTEX vertices = getVertices(lines);
+  VECPOLYGON polygons = getPolygons(lines);
+  VECTEXTURE textures = getTextureMappings(lines);
+  for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
+    glBegin(GL_POLYGON);
+    
+  }
+  
 
   /*
   for (all polygons)
