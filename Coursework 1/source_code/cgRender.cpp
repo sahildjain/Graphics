@@ -37,7 +37,18 @@ void display(void)
   VECTEXTURE textures = getTextureMappings(lines);
   for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
     glBegin(GL_POLYGON);
-    
+    Polygon polygon = *it;
+    vector<int> vertex_id;
+    vertex_id.push_back(polygon.first);
+    vertex_id.push_back(polygon.second);
+    vertex_id.push_back(polygon.third);
+    for(int i = 0; i < vertex_id.size(); i++) {
+      int id = vertex_id[i];
+      TextureMapping texureMapping = texures[id];
+      glTexCoord2f(textureMapping.x, textureMapping.y);
+      Vertex vertex = vertices[id];
+      glVertex3f(vertex.x, vertex.y, vertex.z);
+    }
   }
   
 
