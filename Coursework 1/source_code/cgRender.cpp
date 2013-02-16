@@ -1,4 +1,8 @@
-#include <cgRender.h>
+#include "cgRender.h"
+#include <GL/glut.h>
+#include <stdlib.h>
+#include <fstream>
+#include <iostream>
 #include "surfaceModelParser.cpp"
 
 void init() 
@@ -44,12 +48,15 @@ void display(void)
     vertex_id.push_back(polygon.third);
     for(int i = 0; i < vertex_id.size(); i++) {
       int id = vertex_id[i];
-      TextureMapping texureMapping = texures[id];
+      TextureMapping textureMapping = textures[id];
       glTexCoord2f(textureMapping.x, textureMapping.y);
+      glNormal3f(0.0, 0.0, 0.0);
       Vertex vertex = vertices[id];
       glVertex3f(vertex.x, vertex.y, vertex.z);
     }
+    glEnd();
   }
+  glFlush();
   
 
   /*
