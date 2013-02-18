@@ -183,36 +183,42 @@ VECTEXTURE getTextureMappings() {
   }
 }
 
-/*
-Normal getPolygonNormal(Polygon polygon, VECVERTEX vertices) {
-  Vertex v1 = vertices[polygon.first];
-  Vertex v2 = vertices[polygon.second];
-  Vertex v3 = vertices[polygon.third];
-  float vector1[3] = {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
-  float vector2[3] = {v3.x - v1.x, v3.y - v1.y, v3.z - v1.z};
-  Normal normal;
-  normal.x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
-  normal.y = 0.0 - ();
+void setVertexNormals() {
+  for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    Vertex v = *it;
+    int index = v.index;
+    Vertex * vertex = &v;
+    Vector average;
+    average.x = 0.0;
+    average.y = 0.0;
+    average.z = 0.0;
+    vector<Polygon *> polygonPointers = v.polygonPointers;
+    float size = vertex->polygonPointers.size();
+    for(vector<Polygon *>::iterator iter = polygonPointers.begin(); iter != polygonPointers.end(); ++iter) {
+      Polygon * p = *iter;
+      average.x += p->normal.x;
+      average.y += p->normal.y;
+      average.z += p->normal.z;
+    }
+    float temp1 = average.x / size;
+    float temp2 = average.y / size;
+    float temp3 = average.z / size;
+    float length = (temp1 * temp1 + temp2 * temp2 + temp3 * temp3);
+    average.x = average.x / length;
+    average.y = average.y / length;
+    average.z = average.z / length;
+    vertices[index].normal = average;
+  }
 }
 
-Cood getNormal(Cood vec1 , Cood vec2)
-{
-Cood normal;
-normal.x = (vec1.y * vec2.z) - (vec1.y * vec2.z);
-normal.y =-((vec1.x * vec2.z) - (vec1.z * vec2.x));
-normal.z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
-return normal;
-}
-*/
-
-// prints out each line in the input vector
+// prints out each line
 void printLines() {
   for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
     cout << *it << endl;
   }
 }
 
-// prints out each vertex in the input vector
+// prints out each vertex
 void printVertices() {
   for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
     Vertex vertex = *it;
@@ -220,7 +226,7 @@ void printVertices() {
   }
 }
 
-// prints out each polygon in the input vector
+// prints out each polygon
 void printPolygons() {
   for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
     Polygon polygon = *it;
@@ -244,12 +250,19 @@ void printPolygonNormals() {
   }
 }
 
+void printVertexNormals() {
+  for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    Vertex vertex = *it;
+    cout << vertex.index << " normal: [" << vertex.normal.x << ", " << vertex.normal.y << ", " << vertex.normal.z << "]" << endl;
+  }
+}
+
 int main(void) {
   char * filename = "../data/face.vtk";
   getLines(filename);
   getVertices();
   getPolygons();
-  //getTextureMappings();
-  //setNormalsForPolygons();
-  printPolygonNormals();
+  getTextureMappings();
+  setVertexNormals();
+  //printVertexNormals();
 }

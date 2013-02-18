@@ -37,6 +37,7 @@ struct Vertex {
   float y;
   float z;
   vector<Polygon *> polygonPointers;
+  Vector normal;
 };
 
 struct TextureMapping {
