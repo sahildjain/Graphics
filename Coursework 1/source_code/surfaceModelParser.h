@@ -9,18 +9,26 @@
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
 struct Polygon;
 struct Vertex;
 struct TextureMapping;
-struct Normal;
+struct Vector;
+
+struct Vector {
+  float x;
+  float y;
+  float z;
+};
 
 struct Polygon {
   Vertex * first;
   Vertex * second;
   Vertex * third;
+  Vector normal;
 };
 
 struct Vertex {
@@ -35,12 +43,6 @@ struct TextureMapping {
   int index;
   float x;
   float y;
-};
-
-struct Normal {
-  float x;
-  float y;
-  float z;
 };
 
 #endif

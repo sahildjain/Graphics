@@ -94,6 +94,30 @@ void getVertices() {
   }
 }
 
+Polygon setNormalForPolygon(Polygon polygon) {
+  Vector normal;
+  Vertex v1 = *polygon.first;
+  Vertex v2 = *polygon.second;
+  Vertex v3 = *polygon.third;
+  Vector vec1;
+  vec1.x = v1.x - v2.x;
+  vec1.y = v1.y - v2.y;
+  vec1.z = v1.z - v2.z;
+  Vector vec2;
+  vec2.x = v3.x - v1.x;
+  vec2.y = v3.y - v1.y;
+  vec2.z = v3.z - v1.z;
+  float x = (vec1.y * vec2.z) - (vec1.z * vec2.y);
+  float y = (vec1.z * vec2.x) - (vec1.x * vec2.z);
+  float z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
+  float length = sqrt(x * x + y * y + z * z);
+  normal.x = x / length;
+  normal.y = y / length;
+  normal.z = z / length;
+  polygon.normal = normal;
+  return polygon;
+}
+
 // adds polygons to the vector
 void addPolygon(string line) {
   Polygon * polygon = new Polygon();
@@ -111,6 +135,7 @@ void addPolygon(string line) {
   id = atoi(token);
   polygon->third = &vertices[id];
   vertices[id].polygonPointers.push_back(polygon);
+  *polygon = setNormalForPolygon(*polygon);
   polygons.push_back(*polygon);
 }
 
@@ -210,10 +235,21 @@ void printTextureMappings() {
   }
 }
 
+void printPolygonNormals() {
+  int counter = 0;
+  for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it, ++counter) {
+    Polygon polygon = *it;
+    Vector n = polygon.normal;
+    cout << counter << ": [" << n.x << ", " << n.y << ", " << n.z << "]" << endl;
+  }
+}
+
 int main(void) {
   char * filename = "../data/face.vtk";
   getLines(filename);
   getVertices();
   getPolygons();
-  getTextureMappings();
+  //getTextureMappings();
+  //setNormalsForPolygons();
+  printPolygonNormals();
 }
