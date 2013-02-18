@@ -9,10 +9,4 @@ using namespace std;
 #include <fstream>
 #include <iostream>
 
-struct Normal {
-  float x;
-  float y;
-  float z;
-};
-
 #endif

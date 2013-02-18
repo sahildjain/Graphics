@@ -3,7 +3,14 @@
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include "surfaceModelParser.cpp"
+
+struct Normal {
+  float x;
+  float y;
+  float z;
+};
 
 void init() 
 {
@@ -42,6 +49,7 @@ void display(void)
   for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
     glBegin(GL_POLYGON);
     Polygon polygon = *it;
+    Normal normal = getPolygonNormal();
     vector<int> vertex_id;
     vertex_id.push_back(polygon.first);
     vertex_id.push_back(polygon.second);
@@ -50,14 +58,13 @@ void display(void)
       int id = vertex_id[i];
       TextureMapping textureMapping = textures[id];
       glTexCoord2f(textureMapping.x, textureMapping.y);
-      glNormal3f(0.0, 0.0, 0.0);
       Vertex vertex = vertices[id];
       glVertex3f(vertex.x, vertex.y, vertex.z);
     }
     glEnd();
   }
   glFlush();
-  
+}  
 
   /*
   for (all polygons)
@@ -76,7 +83,6 @@ void display(void)
   //  or, if double buffering is used,
   //  glutSwapBuffers();
   */
-}
 
 void reshape (int w, int h)
 {

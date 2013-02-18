@@ -1,15 +1,33 @@
 #include "surfaceModelParser.h"
 
-using namespace std;
-
 typedef vector<string> VECSTRING;
 typedef vector<Vertex> VECVERTEX;
 typedef vector<Polygon> VECPOLYGON;
 typedef vector<TextureMapping> VECTEXTURE;
 
+VECVERTEX vertices;
+VECPOLYGON polygons;
+VECTEXTURE textures;
+VECSTRING lines;
+
+VECSTRING getLinesVector() {
+  return lines;
+}
+
+VECVERTEX getVerticesVector() {
+  return vertices;
+}
+
+VECPOLYGON getPolygonsVector() {
+  return polygons;
+}
+
+VECTEXTURE getTexturesVector() {
+  return textures;
+}
+
 // returns a vector of the lines in the vtk file
 VECSTRING getLines(const char * filename) {
-  VECSTRING lines;
   string line;
   ifstream file (filename);
   if(file.is_open()) {
@@ -23,7 +41,7 @@ VECSTRING getLines(const char * filename) {
 }
 
 //gets the line number of where str first occurs
-int getLineNum(VECSTRING lines, string str) {
+int getLineNum(string str) {
   int i = 0;
   VECSTRING::iterator it = lines.begin();
   string line = *it;
@@ -41,7 +59,7 @@ int getLineNum(VECSTRING lines, string str) {
 }
 
 //adds vertices to the vector
-VECVERTEX addVertices(VECVERTEX vertices, string line, int index) {
+void addVertices(string line, int index) {
   int counter = 0;
   char * l = &line[0];
   char * token = strtok(l, " ");
@@ -62,52 +80,52 @@ VECVERTEX addVertices(VECVERTEX vertices, string line, int index) {
     counter++;
     index++;
   }
-  return vertices;
 }
 
 //gets vertices from the vtk file
-VECVERTEX getVertices(VECSTRING lines) {
+void getVertices() {
   string line;
-  VECVERTEX vertices;
-  int start = getLineNum(lines, "POINTS") + 1;
-  int end = getLineNum(lines, "POLYGONS");
+  int start = getLineNum("POINTS") + 1;
+  int end = getLineNum("POLYGONS");
   int index = 0;
   for(int i = start; i < end; i++, index += 3) {
     line = lines[i];
-    vertices = addVertices(vertices, line, index);
+    addVertices(line, index);
   }
-  return vertices;
 }
 
 // adds polygons to the vector
-VECPOLYGON addPolygon(VECPOLYGON polygons, string line) {
-  Polygon polygon;
+void addPolygon(string line) {
+  Polygon * polygon = new Polygon();
   char * l = &line[0];
   char * token = strtok(l, " ");  
   token = strtok(NULL, " ");
-  polygon.first = atoi(token);
+  int id = atoi(token);
+  polygon->first = &vertices[id];
+  vertices[id].polygonPointers.push_back(polygon);
   token = strtok(NULL, " ");
-  polygon.second = atoi(token);
+  id = atoi(token);
+  polygon->second = &vertices[id];
+  vertices[id].polygonPointers.push_back(polygon);
   token = strtok(NULL, " ");
-  polygon.third = atoi(token);
-  polygons.push_back(polygon);
-  return polygons;
+  id = atoi(token);
+  polygon->third = &vertices[id];
+  vertices[id].polygonPointers.push_back(polygon);
+  polygons.push_back(*polygon);
 }
 
 // gets polygons from the vtk file
-VECPOLYGON getPolygons(VECSTRING lines) {
+void getPolygons() {
   string line;
-  VECPOLYGON polygons;
-  int start = getLineNum(lines, "POLYGONS") + 1;
-  int end = getLineNum(lines, "POINT_DATA");
+  int start = getLineNum("POLYGONS") + 1;
+  int end = getLineNum("POINT_DATA");
   for(int i = start; i < end; i++) {
     line = lines[i];
-    polygons = addPolygon(polygons, line);
+    addPolygon(line);
   }
-  return polygons;
 }
 
-VECTEXTURE addTextureMappings(VECTEXTURE textures, string line, int index) {
+VECTEXTURE addTextureMappings(string line, int index) {
   char * l = &line[0];
   int counter = 0;
   char * token = strtok(l, " ");  
@@ -124,63 +142,78 @@ VECTEXTURE addTextureMappings(VECTEXTURE textures, string line, int index) {
     index++;
     counter++;
   }
-  return textures;
 }
 
-VECTEXTURE getTextureMappings(VECSTRING lines) {
+VECTEXTURE getTextureMappings() {
   string firstline;
   string secondline;
-  VECTEXTURE textures;
-  int start = getLineNum(lines, "TEXTURE_COORDINATES") + 1;
+  int start = getLineNum("TEXTURE_COORDINATES") + 1;
   int end = lines.size() - 3;
   int index = 0;
   for(int i = start; i < end; i++, index += 9) {
     firstline = lines[i];
     secondline = lines[++i];
     string textureString = firstline + secondline;
-    textures = addTextureMappings(textures, textureString, index);
+    addTextureMappings(textureString, index);
   }
-    cout << "here" << endl;
-  return textures;
 }
 
+/*
+Normal getPolygonNormal(Polygon polygon, VECVERTEX vertices) {
+  Vertex v1 = vertices[polygon.first];
+  Vertex v2 = vertices[polygon.second];
+  Vertex v3 = vertices[polygon.third];
+  float vector1[3] = {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+  float vector2[3] = {v3.x - v1.x, v3.y - v1.y, v3.z - v1.z};
+  Normal normal;
+  normal.x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
+  normal.y = 0.0 - ();
+}
+
+Cood getNormal(Cood vec1 , Cood vec2)
+{
+Cood normal;
+normal.x = (vec1.y * vec2.z) - (vec1.y * vec2.z);
+normal.y =-((vec1.x * vec2.z) - (vec1.z * vec2.x));
+normal.z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
+return normal;
+}
+*/
+
 // prints out each line in the input vector
-void printLines(VECSTRING lines) {
+void printLines() {
   for(VECSTRING::iterator it = lines.begin(); it != lines.end(); ++it) {
     cout << *it << endl;
   }
 }
 
 // prints out each vertex in the input vector
-void printVertices(VECVERTEX vertices) {
+void printVertices() {
   for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
     Vertex vertex = *it;
-    cout << vertex.index << ": [" << vertex.x << ", " << vertex.y << ", " << vertex.z << "]" << endl;
+    cout << vertex.index << ": [" << vertex.x << ", " << vertex.y << ", " << vertex.z << "] adjacent sides: " << vertex.polygonPointers.size() << endl;
   }
 }
 
 // prints out each polygon in the input vector
-void printPolygons(VECPOLYGON polygons) {
+void printPolygons() {
   for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
     Polygon polygon = *it;
-    cout << polygon.first << " " << polygon.second << " " << polygon.third << endl;
+    cout << polygon.first->index << " " << polygon.second->index << " " << polygon.third->index << endl;
   }
 }
 
-void printTextureMappings(VECTEXTURE textures) {
+void printTextureMappings() {
   for(VECTEXTURE::iterator it = textures.begin(); it != textures.end(); ++it) {
     TextureMapping texture = *it;
     cout << texture.index << ": [" << texture.x << ", " << texture.y << "]" << endl;
   }
 }
 
-/*
 int main(void) {
   char * filename = "../data/face.vtk";
-  VECSTRING lines = getLines(filename);
-  VECVERTEX vertices = getVertices(lines);
-  VECPOLYGON polygons = getPolygons(lines);
-  VECTEXTURE textures = getTextureMappings(lines);
-  printTextureMappings(textures);
+  getLines(filename);
+  getVertices();
+  getPolygons();
+  getTextureMappings();
 }
-*/
