@@ -28,6 +28,7 @@ VECTEXTURE getTexturesVector() {
 
 // returns a vector of the lines in the vtk file
 VECSTRING getLines(const char * filename) {
+	lines.clear();
   string line;
   ifstream file (filename);
   if(file.is_open()) {
@@ -84,6 +85,7 @@ void addVertices(string line, int index) {
 
 //gets vertices from the vtk file
 void getVertices() {
+	vertices.clear();
   string line;
   int start = getLineNum("POINTS") + 1;
   int end = getLineNum("POLYGONS");
@@ -104,16 +106,16 @@ Polygon setNormalForPolygon(Polygon polygon) {
   vec1.y = v1.y - v2.y;
   vec1.z = v1.z - v2.z;
   Vector vec2;
-  vec2.x = v3.x - v1.x;
-  vec2.y = v3.y - v1.y;
-  vec2.z = v3.z - v1.z;
+  vec2.x = v1.x - v3.x;
+  vec2.y = v1.y - v3.y;
+  vec2.z = v1.z - v3.z;
   float x = (vec1.y * vec2.z) - (vec1.z * vec2.y);
-  float y = (vec1.z * vec2.x) - (vec1.x * vec2.z);
+  float y = -((vec1.z * vec2.x) - (vec1.x * vec2.z));
   float z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
-  float length = sqrt(x * x + y * y + z * z);
-  normal.x = x / length;
-  normal.y = y / length;
-  normal.z = z / length;
+	float length = sqrt(x * x + y * y + z * z);
+	normal.x = x / length;
+	normal.y = y / length;
+	normal.z = z / length;
   polygon.normal = normal;
   return polygon;
 }
@@ -141,6 +143,7 @@ void addPolygon(string line) {
 
 // gets polygons from the vtk file
 void getPolygons() {
+	polygons.clear();
   string line;
   int start = getLineNum("POLYGONS") + 1;
   int end = getLineNum("POINT_DATA");
@@ -150,7 +153,7 @@ void getPolygons() {
   }
 }
 
-VECTEXTURE addTextureMappings(string line, int index) {
+void addTextureMappings(string line, int index) {
   char * l = &line[0];
   int counter = 0;
   char * token = strtok(l, " ");  
@@ -161,7 +164,7 @@ VECTEXTURE addTextureMappings(string line, int index) {
     textureMapping.y = (float) atof(token);
     textureMapping.index = index;
     textures.push_back(textureMapping);
-    if(counter < 8) { 
+    if(counter != 8) { 
       token = strtok(NULL, " ");
     }
     index++;
@@ -169,7 +172,8 @@ VECTEXTURE addTextureMappings(string line, int index) {
   }
 }
 
-VECTEXTURE getTextureMappings() {
+void getTextureMappings() {
+	textures.clear();
   string firstline;
   string secondline;
   int start = getLineNum("TEXTURE_COORDINATES") + 1;
@@ -177,7 +181,8 @@ VECTEXTURE getTextureMappings() {
   int index = 0;
   for(int i = start; i < end; i++, index += 9) {
     firstline = lines[i];
-    secondline = lines[++i];
+		i++;
+    secondline = lines[i];
     string textureString = firstline + secondline;
     addTextureMappings(textureString, index);
   }
@@ -203,10 +208,10 @@ void setVertexNormals() {
     float temp1 = average.x / size;
     float temp2 = average.y / size;
     float temp3 = average.z / size;
-    float length = (temp1 * temp1 + temp2 * temp2 + temp3 * temp3);
-    average.x = average.x / length;
-    average.y = average.y / length;
-    average.z = average.z / length;
+    float length = sqrt(temp1 * temp1 + temp2 * temp2 + temp3 * temp3);
+    average.x = temp1 / length;
+    average.y = temp2 / length;
+    average.z = temp3 / length;
     vertices[index].normal = average;
   }
 }
@@ -257,12 +262,11 @@ void printVertexNormals() {
   }
 }
 
-int main(void) {
+void parse() {
   char * filename = "../data/face.vtk";
   getLines(filename);
   getVertices();
   getPolygons();
   getTextureMappings();
   setVertexNormals();
-  //printVertexNormals();
 }

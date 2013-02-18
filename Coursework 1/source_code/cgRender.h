@@ -3,6 +3,12 @@
 
 #include <GL/glut.h>
 #include <stdlib.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <GL/glut.h>
+#include <stdlib.h>
+
 
 using namespace std;
 

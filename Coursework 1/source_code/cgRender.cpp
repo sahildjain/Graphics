@@ -1,69 +1,63 @@
 #include "cgRender.h"
-#include <GL/glut.h>
-#include <stdlib.h>
-#include <fstream>
-#include <iostream>
-#include <vector>
 #include "surfaceModelParser.cpp"
-
-struct Normal {
-  float x;
-  float y;
-  float z;
-};
 
 void init() 
 {
   glClearColor (0.0, 0.0, 0.0, 0.0);
   cout << "init" << endl;
 
-  /*
+  
   glShadeModel (GL_SMOOTH);
   
   // Enable lighting
   glEnable (GL_LIGHTING);
   glEnable (GL_LIGHT0);
+
+	float pos[] = {-2.0f, 2.0f, -3.0f, 1.0f };
+	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	float dif[] = {1.0f,1.0f,1.0f,1.0f};
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
+	float amb[] = {0.2f,0.2f, 0.2f, 1.0f};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+
+	/*	
   glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
   glLightfv(GL_LIGHT0, GL_AMBIENT,  LightAmbient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE,  LightDiffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
   
+
   // Set material parameters
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  MaterialSpecular);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, MaterialShininess);
+	*/
   
   // Enable Z-buffering
   glEnable(GL_DEPTH_TEST);
-  */
+  
+}
+
+void setAttr(Vertex * vertex, int id) {
+	TextureMapping mapping = textures[id];
+	glTexCoord2f(mapping.x, mapping.y);
+	glNormal3f(vertex->normal.x, vertex->normal.y, vertex->normal.z);
+	glVertex3f(vertex->x, vertex->y, vertex->z);
 }
 
 void display(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   cout << "display" << endl;
-  char * filename = "../data/face.vtk";
-  VECSTRING lines = getLines(filename);
-  VECVERTEX vertices = getVertices(lines);
-  VECPOLYGON polygons = getPolygons(lines);
-  VECTEXTURE textures = getTextureMappings(lines);
-  for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
-    glBegin(GL_POLYGON);
-    Polygon polygon = *it;
-    Normal normal = getPolygonNormal();
-    vector<int> vertex_id;
-    vertex_id.push_back(polygon.first);
-    vertex_id.push_back(polygon.second);
-    vertex_id.push_back(polygon.third);
-    for(int i = 0; i < vertex_id.size(); i++) {
-      int id = vertex_id[i];
-      TextureMapping textureMapping = textures[id];
-      glTexCoord2f(textureMapping.x, textureMapping.y);
-      Vertex vertex = vertices[id];
-      glVertex3f(vertex.x, vertex.y, vertex.z);
-    }
-    glEnd();
-  }
-  glFlush();
+  parse();
+	for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it) {
+		glBegin(GL_POLYGON);
+		Polygon polygon = *it;
+		setAttr(polygon.first, polygon.first->index);
+		setAttr(polygon.second, polygon.second->index);
+		setAttr(polygon.third, polygon.third->index);
+		glEnd();
+	}
+	glFlush();
 }  
 
   /*
@@ -88,7 +82,14 @@ void reshape (int w, int h)
 {
   cout << "reshape" << endl;
 
-  glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
+  glViewport (0, 0, (GLsizei) w , (GLsizei) h); 
+/*
+	glMatrixMode (GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective((GLdouble) 10,(GLdouble)  10,(GLdouble)  10,(GLdouble)  10);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity();
+  gluLookAt(0, 0, 0, 0, 0, 0, 0, 0, 0);*/
   /*
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity();
@@ -114,7 +115,7 @@ int main(int argc, char** argv)
   glutInit(&argc, argv);
   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); 
   //  Or, can use double buffering
-  //  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
+  //glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
 
   glutInitWindowSize (256, 256); 
   glutInitWindowPosition (0, 0);
