@@ -4,11 +4,13 @@ typedef vector<string> VECSTRING;
 typedef vector<Vertex> VECVERTEX;
 typedef vector<Polygon> VECPOLYGON;
 typedef vector<TextureMapping> VECTEXTURE;
+typedef vector<unsigned char> VECCHAR;
 
 VECVERTEX vertices;
 VECPOLYGON polygons;
 VECTEXTURE textures;
 VECSTRING lines;
+VECCHAR ppmtextures;
 
 VECSTRING getLinesVector() {
   return lines;
@@ -26,9 +28,10 @@ VECTEXTURE getTexturesVector() {
   return textures;
 }
 
+/*-------------------------- VTK FILE ------------------------------- */
+
 // returns a vector of the lines in the vtk file
 VECSTRING getLines(const char * filename) {
-	lines.clear();
   string line;
   ifstream file (filename);
   if(file.is_open()) {
@@ -85,7 +88,7 @@ void addVertices(string line, int index) {
 
 //gets vertices from the vtk file
 void getVertices() {
-	vertices.clear();
+	//vertices.clear();
   string line;
   int start = getLineNum("POINTS") + 1;
   int end = getLineNum("POLYGONS");
@@ -96,6 +99,7 @@ void getVertices() {
   }
 }
 
+// sets the normal for the input polygon
 Polygon setNormalForPolygon(Polygon polygon) {
   Vector normal;
   Vertex v1 = *polygon.first;
@@ -143,7 +147,7 @@ void addPolygon(string line) {
 
 // gets polygons from the vtk file
 void getPolygons() {
-	polygons.clear();
+	//polygons.clear();
   string line;
   int start = getLineNum("POLYGONS") + 1;
   int end = getLineNum("POINT_DATA");
@@ -153,6 +157,7 @@ void getPolygons() {
   }
 }
 
+// adds texture mappings to the texture mappings vector
 void addTextureMappings(string line, int index) {
   char * l = &line[0];
   int counter = 0;
@@ -172,8 +177,8 @@ void addTextureMappings(string line, int index) {
   }
 }
 
+// sets all texture mappings from the vtk file
 void getTextureMappings() {
-	textures.clear();
   string firstline;
   string secondline;
   int start = getLineNum("TEXTURE_COORDINATES") + 1;
@@ -188,6 +193,7 @@ void getTextureMappings() {
   }
 }
 
+// calculates and sets the average vertex normal for each vertex
 void setVertexNormals() {
   for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
     Vertex v = *it;
@@ -239,6 +245,7 @@ void printPolygons() {
   }
 }
 
+// prints out the texture mappings in the vtk file
 void printTextureMappings() {
   for(VECTEXTURE::iterator it = textures.begin(); it != textures.end(); ++it) {
     TextureMapping texture = *it;
@@ -246,6 +253,7 @@ void printTextureMappings() {
   }
 }
 
+// prints out the normal to every polygon
 void printPolygonNormals() {
   int counter = 0;
   for(VECPOLYGON::iterator it = polygons.begin(); it != polygons.end(); ++it, ++counter) {
@@ -255,6 +263,7 @@ void printPolygonNormals() {
   }
 }
 
+// prints out the average normal for each vertex
 void printVertexNormals() {
   for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
     Vertex vertex = *it;
@@ -262,11 +271,58 @@ void printVertexNormals() {
   }
 }
 
+/*----------------------------------------------------------------------------*/
+
+/*--------------------------------PPM FILE----------------------------------- */
+
+// returns a vector of the lines in the ppm file
+void getPpm(const char * filename) {
+	string line;
+	int width, height, colour, pixels;	
+	unsigned char l;
+	ifstream file;
+	file.open(filename);
+	if(file.is_open()) {
+		getline(file, line);
+		file >> width;
+		file >> height;
+		getline(file, line);
+		file >> colour;
+		getline(file, line);
+		pixels = width * height * 3;
+		for(int i = 0; i < pixels; ++i) {
+			l = file.get();
+			ppmtextures.push_back(l);
+		}
+	}
+	else {
+		cout << "Error opening " << filename << endl;
+	}
+}
+
+void printPpmTextures() {
+	for(VECCHAR::iterator it = ppmtextures.begin(); it != ppmtextures.end(); ++it) {
+		cout << *it;
+		++it;
+		cout << *it;
+		++it;
+		cout << *it << endl;
+	}
+}
+
+/*------------------------------------------------- ---------------------------*/
+
+// parses the files (vtk and ppm)
 void parse() {
-  char * filename = "../data/face.vtk";
-  getLines(filename);
+	/*---------vtk--------*/
+  char * vtkname = "../data/face.vtk";
+  getLines(vtkname);
   getVertices();
   getPolygons();
   getTextureMappings();
   setVertexNormals();
+
+	/*---------ppm--------*/
+	char * ppmname = "../data/face.ppm";
+	getPpm(ppmname);
 }
