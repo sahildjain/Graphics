@@ -46,4 +46,18 @@ struct TextureMapping {
   float y;
 };
 
+typedef vector<string> VECSTRING;
+typedef vector<Vertex> VECVERTEX;
+typedef vector<Polygon> VECPOLYGON;
+typedef vector<TextureMapping> VECTEXTURE;
+
+extern VECVERTEX vertices;
+extern VECPOLYGON polygons;
+extern VECTEXTURE textures;
+extern VECSTRING lines;
+extern unsigned char * texdata;
+extern int pixels, width, height;
+
+void parse(void);
+
 #endif

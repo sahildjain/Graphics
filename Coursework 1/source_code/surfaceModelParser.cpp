@@ -1,16 +1,11 @@
 #include "surfaceModelParser.h"
 
-typedef vector<string> VECSTRING;
-typedef vector<Vertex> VECVERTEX;
-typedef vector<Polygon> VECPOLYGON;
-typedef vector<TextureMapping> VECTEXTURE;
-typedef vector<unsigned char> VECCHAR;
-
 VECVERTEX vertices;
 VECPOLYGON polygons;
 VECTEXTURE textures;
 VECSTRING lines;
-VECCHAR ppmtextures;
+unsigned char * texdata;
+int pixels, width, height;
 
 VECSTRING getLinesVector() {
   return lines;
@@ -31,9 +26,10 @@ VECTEXTURE getTexturesVector() {
 /*-------------------------- VTK FILE ------------------------------- */
 
 // returns a vector of the lines in the vtk file
-VECSTRING getLines(const char * filename) {
+VECSTRING getLines(string filename) {
+	const char * name = &filename[0];
   string line;
-  ifstream file (filename);
+  ifstream file (name);
   if(file.is_open()) {
     while(file.good()) {
       getline(file, line);
@@ -157,7 +153,7 @@ void getPolygons() {
   }
 }
 
-// adds texture mappings to the texture mappings vector
+// adds texture mappings to the texture mappings vectorhttp://www.1channel.ch/external.php?title=Suits&url=aHR0cDovL2dvcmlsbGF2aWQuaW4vZWswN3RiNmkyNW80&domain=Z29yaWxsYXZpZC5pbg==&loggedin=0
 void addTextureMappings(string line, int index) {
   char * l = &line[0];
   int counter = 0;
@@ -275,38 +271,36 @@ void printVertexNormals() {
 
 /*--------------------------------PPM FILE----------------------------------- */
 
-// returns a vector of the lines in the ppm file
-void getPpm(const char * filename) {
-	string line;
-	int width, height, colour, pixels;	
-	unsigned char l;
+// returns an array of the lines in the ppm file
+unsigned char * getPpm(string filename) {
+	const char * name = &filename[0];
 	ifstream file;
-	file.open(filename);
+	int maxcolour;
+	unsigned char * data;
+	file.open(name);
 	if(file.is_open()) {
-		getline(file, line);
+		string text;
+		getline(file, text);
 		file >> width;
 		file >> height;
-		getline(file, line);
-		file >> colour;
-		getline(file, line);
+		getline(file, text);
+		file >> maxcolour;
+		getline(file, text);
 		pixels = width * height * 3;
+		data = new unsigned char[pixels];
 		for(int i = 0; i < pixels; ++i) {
-			l = file.get();
-			ppmtextures.push_back(l);
+			data[i] = file.get();
 		}
 	}
-	else {
-		cout << "Error opening " << filename << endl;
-	}
+	else{
+  	cout << "Error opening file" <<endl;
+  }
+	return data;
 }
 
 void printPpmTextures() {
-	for(VECCHAR::iterator it = ppmtextures.begin(); it != ppmtextures.end(); ++it) {
-		cout << *it;
-		++it;
-		cout << *it;
-		++it;
-		cout << *it << endl;
+	for(int i = 0; i < pixels; ++i) {
+		cout << (short) texdata[i] << endl;
 	}
 }
 
@@ -315,7 +309,7 @@ void printPpmTextures() {
 // parses the files (vtk and ppm)
 void parse() {
 	/*---------vtk--------*/
-  char * vtkname = "../data/face.vtk";
+  string vtkname = "../data/face.vtk";
   getLines(vtkname);
   getVertices();
   getPolygons();
@@ -323,6 +317,6 @@ void parse() {
   setVertexNormals();
 
 	/*---------ppm--------*/
-	char * ppmname = "../data/face.ppm";
-	getPpm(ppmname);
+	string ppmname = "../data/face.ppm";
+	texdata = getPpm(ppmname);
 }

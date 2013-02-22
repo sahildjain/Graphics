@@ -1,5 +1,5 @@
 #include "cgRender.h"
-#include "surfaceModelParser.cpp"
+#include "surfaceModelParser.h"
 
 GLfloat eyex;
 GLfloat eyey;
@@ -14,52 +14,13 @@ GLfloat lightz = 10.0f;
 GLfloat lightx = 50.0f;
 GLfloat LightPosition[] = {lightx, 0, lightz};
 
-// gets the average of all x coorindates of the vertex normals
-float getAverageX() {
-	float x = 0.0;
-	for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
-		Vertex vertex = *it;
-		x += vertex.x;
-	}
-	int size = vertices.size();
-	return x / (float) size;
-}
-
-// gets the average of all y coorindates of the vertex normals
-float getAverageY() {
-	float y = 0.0;
-	for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
-		Vertex vertex = *it;
-		y += vertex.y;
-	}
-	int size = vertices.size();
-	return y / (float) size;
-}
-
-// gets the average of all z coorindates of the vertex normals
-float getAverageZ() {
-	float z = 0.0;
-	for(VECVERTEX::iterator it = vertices.begin(); it != vertices.end(); ++it) {
-		Vertex vertex = *it;
-		z += vertex.z;
-	}
-	int size = vertices.size();
-	return z / (float) size;
-}
-
-/*
-GLfloat centerx = getAverageX();
-GLfloat centery = getAverageY();
-GLfloat centerz = getAverageZ();
-*/
-
 void init() 
 {
   glClearColor (0.0, 0.0, 0.0, 0.0);
   cout << "init" << endl;
 
 	GLfloat LightAmbient[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	GLfloat LightDiffuse[] = {0.2f, 0.2f, 0.2f, 0.2f};
+	GLfloat LightDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	GLfloat LightSpecular[] = {0.2f, 0.2f, 0.2f, 0.2f};
 	GLfloat MaterialSpecular[] = {0.3f, 0.3f, 0.3f, 1.0f};
 	GLfloat MaterialShininess[] = {10.0};
@@ -77,7 +38,19 @@ void init()
   
   // Enable Z-buffering
   glEnable(GL_DEPTH_TEST);
-  
+
+	GLuint texture;
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures( 1, &texture );
+	glBindTexture( GL_TEXTURE_2D, texture );
+	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
+
 }
 
 void setAttr(Vertex * vertex, int id) {
@@ -167,8 +140,6 @@ int main(int argc, char** argv)
   // Initialize graphics window
   glutInit(&argc, argv);
   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); 
-  //  Or, can use double buffering
-  //glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
 
   glutInitWindowSize (256, 256); 
   glutInitWindowPosition (0, 0);
