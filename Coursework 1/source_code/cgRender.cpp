@@ -20,7 +20,7 @@ void init()
   cout << "init" << endl;
 
 	GLfloat LightAmbient[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	GLfloat LightDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat LightDiffuse[] = {0.7f, 0.7f, 0.7f, 0.7f};
 	GLfloat LightSpecular[] = {0.2f, 0.2f, 0.2f, 0.2f};
 	GLfloat MaterialSpecular[] = {0.3f, 0.3f, 0.3f, 1.0f};
 	GLfloat MaterialShininess[] = {10.0};
@@ -50,7 +50,6 @@ void init()
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
-
 }
 
 void setAttr(Vertex * vertex, int id) {
