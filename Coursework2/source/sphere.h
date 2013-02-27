@@ -7,8 +7,13 @@
 
 #include "raycast.h"
 
-class Sphere : public Object3D{
+class Sphere : public Object3D {
 
+private:
+
+	Vec3f centre;
+	float radius;
+	Vec3f color;
 
 public:
 

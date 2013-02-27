@@ -31,6 +31,9 @@ public:
 
   bool intersect(const Ray &r, Hit &h);
 
+  int getCount();
+  
+  Object3D** getObjects();
 };
 
 #endif /* GROUP_H_ */

@@ -27,13 +27,42 @@ Group::~Group() {
 
 // Insert an object into the array.
 void Group::addObject(int index, Object3D *obj) {
-
-  // YOUR CODE HERE.
+  Object3D ** newObjects = new Object3D*[getCount() + 1];
+  Object3D ** objects = getObjects();
+  if(index < getCount()) {
+    int i;
+    for(i = 0; i < index; ++i) {
+      newObjects[i] = objects[i];
+    }
+    newObjects[index] = obj;
+    for(i = index + 1; i < getCount() + 1; ++i) {
+      newObjects[i] = objects[i - 1];
+    }
+  }
+  else { // add to the end of the array
+    for(int i = 0; i < getCount(); ++i) {
+      newObjects[i] = objects[i];
+    }
+    newObjects[getCount()] = obj;
+  }
+  this->_count++;
 }
 
-bool Group::intersect(const Ray &r, Hit &h)
-{
+// Loops over all primitives in the group calling each one's
+// intersection method in turn.
+bool Group::intersect(const Ray &r, Hit &h) {
+  Object3D ** o = getObjects();
+  for(int i = 0; i < this->_count; ++i) {
+    Object3D * object = o[i];
+    object->intersect(r, h);
+  }
+  return true;
+}
 
-  // YOUR CODE HERE.
+int Group::getCount() {
+  return this->_count;
+}
 
+Object3D** Group::getObjects() {
+  return this->_object;
 }

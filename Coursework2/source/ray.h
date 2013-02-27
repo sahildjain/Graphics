@@ -18,10 +18,21 @@ public:
   Ray (const Ray& r) {*this=r;}
 
   // ACCESSORS
-  const Vec3f& getOrigin() const { return origin; }
-  const Vec3f& getDirection() const { return direction; }
+  const Vec3f& getOrigin() const { 
+    return origin; 
+  }
+  
+  const Vec3f& getDirection() const { 
+    return direction; 
+  }
+  
+  void setDirection() { 
+    this->direction = direction;
+  }
+  
   Vec3f pointAtParameter(float t) const {
-    return origin+direction*t; }
+    return origin+direction*t; 
+  }
 
 private:
 
