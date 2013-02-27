@@ -26,8 +26,12 @@ public:
     return direction; 
   }
   
-  void setDirection() { 
+  void setDirection(Vec3f &direction) { 
     this->direction = direction;
+  }
+  
+  void setOrigin(Vec3f &origin) {
+    this->origin = origin;
   }
   
   Vec3f pointAtParameter(float t) const {

@@ -26,7 +26,6 @@ Ray OrthographicCamera::generateRay(Vec2f point) {
   
   // check if up and direction vector are orthogonal
   Vec3f up = getUp();
-  up.Normalize();
   
   // horizontal vector is the cross product of up and direction
   Vec3f horizontal;
@@ -37,10 +36,44 @@ Ray OrthographicCamera::generateRay(Vec2f point) {
   // use the horizontal vector to find a perpendicular vector
   // to horizontal and direction, which will be orthonormal
   if(up.Dot3(projectionDirection) != 0) {
-    Vec3f::Cross3(up, horizontal, projectionDirection);
-    up.Normalize();
-    this->up = up;
+    Vec3f::Cross3(up, horizontal, projectionDirection); 
   }
+  up.Normalize();
+  this->up = up;
+  
+  //calculating the origin using the input point
+  Vec3f origin;
+  float pX = point.x() * getSize();
+  float pY = point.y() * getSize();
+  float centreX = getCentre().x();
+  float centreY = getCentre().y();
+  
+  float originX, originY;
+  if(pX > centreX) {
+    originX = pX - centreX;
+  }
+  else if(pX > centreX) {
+    originX = centreX - pX;  
+  }
+  else {
+    originX = centreX;
+  }
+  
+  if(pY > centreY) {
+    originY = pY - centreY;
+  }
+  else if(pY > centreY) {
+    originY = centreY - pY;  
+  }
+  else {
+    originY = centreY;
+  }
+  
+  origin.Set(originX, originY, getCentre().z());
+  
+  // As the camera is orthogonal, the direction is always the projection direction
+  Ray *ray = new Ray(projectionDirection, origin);
+  return *ray;
 }
 
 Vec3f OrthographicCamera::getCentre() {
