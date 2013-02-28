@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <vector>
 
 #include <math.h>
 #include <assert.h>

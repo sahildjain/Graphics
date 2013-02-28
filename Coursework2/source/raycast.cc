@@ -13,6 +13,14 @@ int _height     = 100;
 float _depthMin = 0;
 float _depthMax = 1;
 
+double infinity = 1.0 / 0.0;
+
+Group * group;
+Camera * camera;
+Vec3f background;
+vector<Ray> rayVector;
+vector<Hit> hitVector;
+
 // Render a color image of objects in a scene.
 void renderRGBImage(SceneParser &, Image &);
 
@@ -78,14 +86,35 @@ int main(int argc, char** argv) {
 
 // Render a color image of objects in a scene.
 void renderRGBImage(SceneParser &scene, Image &image) {
-
-  // YOUR CODE HERE.
-
+  
+  // Get the group, camera and background
+  group = scene.getGroup();
+  camera = scene.getCamera();
+  background = scene.getBackgroundColor();
+  
+  float widthDivisions = 1 / (float) image.Width();
+  float heightDivisions = 1 / (float) image.Height();
+  
+  // generate rays for each pixel
+  for(float x = 0; x < (float) image.Width(); x += widthDivisions) {
+    for(float y = 0; y < (float) image.Height(); y += heightDivisions) {
+      Vec2f point;
+      point.Set(x, y);
+      Ray ray = camera->generateRay(point);
+      rayVector.push_back(ray);
+      Hit *hit = new Hit((float) infinity, background);
+      hitVector.push_back(*hit);
+    }
+  }
+  
+  for(int i = 0; i < (int) rayVector.size(); ++i) {
+    group->intersect(rayVector[i], hitVector[i]);
+    
+  }
+  
 }
 
 // Render an image showing the depth of objects from the camera.
 void renderDepthImage(SceneParser &scene, Image &image) {
-
-  // YOUR CODE HERE.
 
 }
