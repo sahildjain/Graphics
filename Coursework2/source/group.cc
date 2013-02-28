@@ -45,7 +45,8 @@ void Group::addObject(int index, Object3D *obj) {
     }
     newObjects[getCount()] = obj;
   }
-  this->_count++;
+  this->_object = newObjects;
+  //this->_count++;
 }
 
 // Loops over all primitives in the group calling each one's

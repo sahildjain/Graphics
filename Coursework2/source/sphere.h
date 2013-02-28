@@ -26,6 +26,10 @@ public:
   // A concrete implementation of pure virtual function in parent
   // class.
   virtual bool intersect(const Ray &r, Hit &h);
+  
+  float getRadius() {
+      return this->radius;
+  }
 
 };
 

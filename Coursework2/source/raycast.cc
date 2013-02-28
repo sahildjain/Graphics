@@ -18,8 +18,6 @@ double infinity = 1.0 / 0.0;
 Group * group;
 Camera * camera;
 Vec3f background;
-vector<Ray> rayVector;
-vector<Hit> hitVector;
 
 // Render a color image of objects in a scene.
 void renderRGBImage(SceneParser &, Image &);
@@ -92,24 +90,17 @@ void renderRGBImage(SceneParser &scene, Image &image) {
   camera = scene.getCamera();
   background = scene.getBackgroundColor();
   
-  float widthDivisions = 1 / (float) image.Width();
-  float heightDivisions = 1 / (float) image.Height();
-  
   // generate rays for each pixel
-  for(float x = 0; x < (float) image.Width(); x += widthDivisions) {
-    for(float y = 0; y < (float) image.Height(); y += heightDivisions) {
+  for(float x = 0; x < (float) image.Width(); ++x) {
+    for(float y = 0; y < (float) image.Height(); ++y) {
       Vec2f point;
-      point.Set(x, y);
+      point.Set(x / image.Width(), y / image.Height());
       Ray ray = camera->generateRay(point);
-      rayVector.push_back(ray);
       Hit *hit = new Hit((float) infinity, background);
-      hitVector.push_back(*hit);
+      group->intersect(ray, *hit);
+      Vec3f newColour = hit->getColor();
+      image.SetPixel(x, y, newColour);
     }
-  }
-  
-  for(int i = 0; i < (int) rayVector.size(); ++i) {
-    group->intersect(rayVector[i], hitVector[i]);
-    
   }
   
 }
