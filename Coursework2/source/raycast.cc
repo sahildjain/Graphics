@@ -90,7 +90,7 @@ void renderRGBImage(SceneParser &scene, Image &image) {
   camera = scene.getCamera();
   background = scene.getBackgroundColor();
   
-  // generate rays for each pixel
+  // generate rays for each pixel, update Hit and set the pixel in image.
   for(float x = 0; x < (float) image.Width(); ++x) {
     for(float y = 0; y < (float) image.Height(); ++y) {
       Vec2f point;

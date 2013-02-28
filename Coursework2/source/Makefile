@@ -1,7 +1,7 @@
 CC      = c++
 LD      = c++
 
-CFLAGS  = -Wall -O2 -I. -c
+CFLAGS  = -O2 -I. -c
 
 LDFLAGS = -lm
 
