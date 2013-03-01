@@ -49,7 +49,7 @@ bool Sphere::intersect(const Ray &r, Hit &h)
 		float distance2 = 0 - dotProduct - sqrtD;
 		float newDistance;
 		if(distance2 < distance1) {
-			newDistance = distance2; 
+			newDistance = distance2;
 		}
 		else {
 			newDistance = distance1;

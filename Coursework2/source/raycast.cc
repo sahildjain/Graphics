@@ -13,8 +13,6 @@ int _height     = 100;
 float _depthMin = 0;
 float _depthMax = 1;
 
-double infinity = 1.0 / 0.0;
-
 Group * group;
 Camera * camera;
 Vec3f background;
@@ -96,7 +94,7 @@ void renderRGBImage(SceneParser &scene, Image &image) {
       Vec2f point;
       point.Set(x / image.Width(), y / image.Height());
       Ray ray = camera->generateRay(point);
-      Hit *hit = new Hit((float) infinity, background);
+      Hit *hit = new Hit(_depthMax, background);
       group->intersect(ray, *hit);
       Vec3f newColour = hit->getColor();
       image.SetPixel(x, y, newColour);
@@ -107,5 +105,37 @@ void renderRGBImage(SceneParser &scene, Image &image) {
 
 // Render an image showing the depth of objects from the camera.
 void renderDepthImage(SceneParser &scene, Image &image) {
+  
+    // Get the group, camera and background
+  group = scene.getGroup();
+  camera = scene.getCamera();
+  background = scene.getBackgroundColor();
+  
+  // generate rays for each pixel, update Hit and set the pixel in image.
+  for(float x = 0; x < (float) image.Width(); ++x) {
+    for(float y = 0; y < (float) image.Height(); ++y) {
+      Vec2f point;
+      point.Set(x / image.Width(), y / image.Height());
+      Ray ray = camera->generateRay(point);
+      Hit *hit = new Hit(_depthMax, background);
+      group->intersect(ray, *hit);
+      float distance = hit->getT();
+      float depth;
+      if(distance <= _depthMin) {
+	depth = 1.0;
+      }
+      else if(distance >= _depthMax) {
+	depth = 0.0;
+      }
+      else {
+	float a = _depthMax - _depthMin;
+	float b = _depthMax - distance;
+	depth = b / a;
+      }
+      Vec3f newColour;
+      newColour.Set(depth, depth, depth);
+      image.SetPixel(x, y, newColour);
+    }
+  }
 
 }

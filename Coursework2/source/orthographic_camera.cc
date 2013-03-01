@@ -18,53 +18,48 @@ OrthographicCamera::OrthographicCamera(Vec3f centre, Vec3f direction, Vec3f up, 
  * of the ray in the world coordinates
  */
 Ray OrthographicCamera::generateRay(Vec2f point) {
-
+  
   // normalise the input projection direction
   Vec3f projectionDirection = getDirection();
   projectionDirection.Normalize();
   this->direction = projectionDirection;
   
   Vec3f up = getUp();
-  
+  up.Normalize();
   // horizontal vector is the cross product of up and direction
   Vec3f horizontal;
-  Vec3f::Cross3(horizontal, up, projectionDirection);
+  Vec3f::Cross3(horizontal, projectionDirection, up);
   horizontal.Normalize();
   
   // check if up and direction are orthogonal. if they are not,
   // use the horizontal vector to find a perpendicular vector
   // to horizontal and direction, which will be orthonormal
   if(up.Dot3(projectionDirection) != 0) {
-    Vec3f::Cross3(up, horizontal, projectionDirection); 
+    Vec3f::Cross3(up, projectionDirection, horizontal); 
   }
   up.Normalize();
   this->up = up;
   
   //calculating the origin using the input point
-  Vec3f origin;
-  float pX = point.x() * getSize();
-  float pY = point.y() * getSize();
-  float centreX = getCentre().x();
-  float centreY = getCentre().y();
-  
-  float originX = centreX;
-  float originY = centreY;
-  
-  if(pX > centreX) {
-    originX = pX - centreX;
-  }
-  else if(pX < centreX) {
-    originX = centreX - pX;  
+  Vec3f origin = getCentre();
+
+  if(point.x() != 0.5) {
+    if (point.x() < 0.5) {
+      origin += horizontal * ((0.5 - point.x()) * getSize());
+    }
+    else {
+      origin -= horizontal * ((point.x() - 0.5) * getSize());
+    }
   }
   
-  if(pY > centreY) {
-    originY = pY - centreY;
+  if(point.y() != 0.5) {
+    if (point.y() < 0.5) {
+      origin += up * ((0.5 - point.y()) * getSize());
+    }
+    else {
+      origin -= up * ((point.y() - 0.5) * getSize());
+    }
   }
-  else if(pY < centreY) {
-    originY = centreY - pY;  
-  }
-  
-  origin.Set(originX, originY, getCentre().z());
   
   // As the camera is orthogonal, the direction is always the projection direction
   Ray *ray = new Ray(projectionDirection, origin);

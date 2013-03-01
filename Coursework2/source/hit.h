@@ -23,7 +23,6 @@ public:
   void set(float _t, Vec3f c) { t = _t; color = c; }
 
 private:
-
   // REPRESENTATION
   float t;
   Vec3f color;
